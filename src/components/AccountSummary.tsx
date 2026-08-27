@@ -1,4 +1,4 @@
-import { ChevronLeft, MoreHorizontal, Star } from 'lucide-react';
+import { ChevronLeft, Star } from 'lucide-react';
 import { getCurrentFormattedTime } from '../utils/formatDate';
 
 type AccountSummaryProps = {
