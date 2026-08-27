@@ -1,4 +1,4 @@
-import { ChevronLeft, Star } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { getCurrentFormattedTime } from '../utils/formatDate';
 
 type AccountSummaryProps = {
@@ -21,23 +21,21 @@ export function AccountSummary({
 
   return (
     <div className="bg-[#2554eb] text-white px-5 pt-8 pb-8">
-      {/* 1. ナビゲーションバー */}
+      {/* 1. ナビゲーションバー (가운데 정렬) */}
       <div className="flex items-center justify-between">
-        <button
-          type="button"
-          className="p-1 -ml-1 text-white hover:opacity-80 font-semibold cursor-pointer"
-        >
-          <ChevronLeft className="w-6 h-6" />
-        </button>
-        <span className="text-xl font-bold">
-          {currentView === 'list' ? '取引一覧' : 'カレンダー'}
-        </span>
+        {/* 왼쪽: 오른쪽 버튼과 똑같은 크기의 투명 빈 상자 (균형 맞추기용) */}
+        <div className="w-9"></div>
 
-        {/* 画面切り替えボタン（一覧 ⇔ カレンダー） */}
+        {/* ⭐ 가운데: 제목이 남은 공간을 다 먹고 정중앙 정렬! ⭐ */}
+        <h1 className="text-xl font-bold text-center flex-1">
+          {currentView === 'list' ? '取引一覧' : 'カレンダー'}
+        </h1>
+
+        {/* 오른쪽: 화면 전환 버튼 */}
         <button
           type="button"
           onClick={onToggleView}
-          className="bg-blue-700 hover:bg-blue-600 p-2 rounded-xl text-sm transition-colors cursor-pointer"
+          className="w-9 h-9 bg-blue-700 hover:bg-blue-600 rounded-xl text-sm flex items-center justify-center transition-colors cursor-pointer"
           title={currentView === 'list' ? 'カレンダーを見る' : '一覧を見る'}
         >
           {currentView === 'list' ? '📅' : '📋'}
