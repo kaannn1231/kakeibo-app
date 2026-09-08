@@ -1,61 +1,113 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AccountSummary } from './components/AccountSummary';
 import { ExpenseList } from './components/ExpenseList';
 import { ExpenseForm } from './components/ExpenseForm';
 import { Calendar } from './components/Calendar';
-import { MOCK_EXPENSES, INITIAL_BUDGET } from './data/mockExpenses';
+import { INITIAL_BUDGET } from './data/mockExpenses';
 import { getDayFromDate } from './utils/date';
+import type { Category } from './constants/categories';
 import type { Expense, NewExpense } from './types/expense';
 
+const API_URL = 'http://localhost:3001/api/expenses';
+
+type ApiExpense = Omit<Expense, 'date' | 'category'> & {
+  date: string;
+  category: string;
+};
+
+function toExpense(expense: ApiExpense): Expense {
+  return {
+    ...expense,
+    date: expense.date.slice(0, 10),
+    category: expense.category as Category,
+  };
+}
+
 function App() {
-  // 1. 支出リストの状態管理（初期値: モックデータ）
-  const [expenses, setExpenses] = useState<Expense[]>(MOCK_EXPENSES);
-
-  // 2. 現在の画面表示（'list': 一覧画面, 'calendar': カレンダー画面）
+  const [expenses, setExpenses] = useState<Expense[]>([]);
   const [currentView, setCurrentView] = useState<'list' | 'calendar'>('list');
-
-  // 3. カレンダーで選択されている日付（初期値: 当日）
   const [selectedDay, setSelectedDay] = useState(new Date().getDate());
 
-  // 対象年月（2026年8月）
   const currentYear = 2026;
   const currentMonth = 8;
 
-  // 4. 今月の総支出額を算出
-  const totalExpense = expenses.reduce((sum, item) => sum + item.amount, 0);
+  useEffect(() => {
+    const loadExpenses = async () => {
+      try {
+        const response = await fetch(API_URL);
 
-  // 5. 残高の計算（初期予算 - 総支出額）
+        if (!response.ok) {
+          throw new Error('지출 목록을 불러오지 못했습니다.');
+        }
+
+        const data: ApiExpense[] = await response.json();
+        setExpenses(data.map(toExpense));
+      } catch (error) {
+        console.error(error);
+        alert('서버에서 지출 목록을 불러오지 못했습니다.');
+      }
+    };
+
+    loadExpenses();
+  }, []);
+
+  const totalExpense = expenses.reduce((sum, item) => sum + item.amount, 0);
   const balance = INITIAL_BUDGET - totalExpense;
 
-  // 6. 日別の支出合計額を計算（カレンダー表示用: { 17: 3680, 18: 1540 }）
   const dailyTotals = expenses.reduce<Record<number, number>>((totals, item) => {
     const day = getDayFromDate(item.date);
     totals[day] = (totals[day] || 0) + item.amount;
     return totals;
   }, {});
 
-  // 7. カレンダーで選択した日付の支出のみを抽出（フィルタリング）
   const selectedExpenses = expenses.filter(
     (item) => getDayFromDate(item.date) === selectedDay
   );
 
-  // 8. 新規支出の追加処理
-  const handleAddExpense = (newExpenseData: NewExpense) => {
-    const newExpense: Expense = {
-      ...newExpenseData,
-      id: Date.now().toString(), // 一意のIDを自動生成
-    };
-    setExpenses([newExpense, ...expenses]);
-    // 追加した支出の日付を選択状態に更新
-    setSelectedDay(getDayFromDate(newExpense.date));
+  const handleAddExpense = async (newExpenseData: NewExpense) => {
+    try {
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newExpenseData),
+      });
+
+      if (!response.ok) {
+        throw new Error('지출을 저장하지 못했습니다.');
+      }
+
+      const savedExpense: ApiExpense = await response.json();
+      const expense = toExpense(savedExpense);
+
+      setExpenses((currentExpenses) => [expense, ...currentExpenses]);
+      setSelectedDay(getDayFromDate(expense.date));
+    } catch (error) {
+      console.error(error);
+      alert('지출 저장에 실패했습니다. 서버가 켜져 있는지 확인해 주세요.');
+    }
   };
 
-  // 9. 支出の削除処理
-  const handleDeleteExpense = (idToDelete: string) => {
-    setExpenses(expenses.filter((item) => item.id !== idToDelete));
+  const handleDeleteExpense = async (idToDelete: string) => {
+    try {
+      const response = await fetch(`${API_URL}/${idToDelete}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('지출을 삭제하지 못했습니다.');
+      }
+
+      setExpenses((currentExpenses) =>
+        currentExpenses.filter((item) => item.id !== idToDelete)
+      );
+    } catch (error) {
+      console.error(error);
+      alert('지출 삭제에 실패했습니다.');
+    }
   };
 
-  // 10. 画面表示の切り替え（一覧 ⇔ カレンダー）
   const handleToggleView = () => {
     setCurrentView(currentView === 'list' ? 'calendar' : 'list');
   };
@@ -63,7 +115,6 @@ function App() {
   return (
     <div className="min-h-screen bg-slate-100 flex justify-center py-0 sm:py-6">
       <div className="w-full max-w-md bg-white min-h-screen sm:min-h-[850px] shadow-2xl flex flex-col rounded-none sm:rounded-3xl overflow-hidden">
-        {/* 上部ヘッダー（残高・総支出・画面切り替えボタン） */}
         <AccountSummary
           totalExpense={totalExpense}
           balance={balance}
@@ -71,10 +122,8 @@ function App() {
           onToggleView={handleToggleView}
         />
 
-        {/* 画面の条件付きレンダリング */}
         {currentView === 'list' ? (
           <>
-            {/* 【取引一覧画面】 */}
             <div className="flex-1 overflow-y-auto">
               <ExpenseList
                 expenses={expenses}
@@ -84,9 +133,7 @@ function App() {
             <ExpenseForm onAddExpense={handleAddExpense} />
           </>
         ) : (
-          /* 【カレンダー画面】 */
           <div className="flex-1 overflow-y-auto bg-slate-50 flex flex-col">
-            {/* カレンダーコンポーネント */}
             <Calendar
               year={currentYear}
               month={currentMonth}
@@ -95,7 +142,6 @@ function App() {
               onSelectDay={setSelectedDay}
             />
 
-            {/* 選択した日付の支出一覧 */}
             <div className="flex-1 px-2 pb-4">
               <div className="px-3 py-1 text-xs font-bold text-slate-500">
                 📅 {currentMonth}月 {selectedDay}日 の支出 ({selectedExpenses.length}件)
