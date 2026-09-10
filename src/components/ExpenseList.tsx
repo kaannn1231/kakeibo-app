@@ -3,13 +3,14 @@ import { ExpenseItem } from './ExpenseItem';
 
 type ExpenseListProps = {
   expenses: Expense[];
+  onEditExpense: (expense: Expense) => void;
   onDeleteExpense: (id: string) => void;
 };
 
 /**
  * 支出データ一覧を表示するコンポーネント
  */
-export function ExpenseList({ expenses, onDeleteExpense }: ExpenseListProps) {
+export function ExpenseList({ expenses, onEditExpense, onDeleteExpense }: ExpenseListProps) {
   // 支出データが0件の場合
   if (expenses.length === 0) {
     return (
@@ -31,6 +32,7 @@ export function ExpenseList({ expenses, onDeleteExpense }: ExpenseListProps) {
         <ExpenseItem
           key={item.id}
           expense={item}
+          onEditExpense={onEditExpense}
           onDeleteExpense={onDeleteExpense}
         />
       ))}

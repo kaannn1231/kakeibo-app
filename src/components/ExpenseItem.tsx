@@ -1,15 +1,16 @@
-import { Trash2 } from 'lucide-react';
+import { Trash2, Pencil } from 'lucide-react';
 import type { Expense } from '../types/expense';
 
 type ExpenseItemProps = {
   expense: Expense;
+  onEditExpense: (expense: Expense) => void; // 修正処理関数
   onDeleteExpense: (id: string) => void; // 削除処理関数
 };
 
 /**
  * 支出データ1件分をカード形式で表示するコンポーネント
  */
-export function ExpenseItem({ expense, onDeleteExpense }: ExpenseItemProps) {
+export function ExpenseItem({ expense, onEditExpense, onDeleteExpense }: ExpenseItemProps) {
   return (
     <div className="flex items-center justify-between p-3.5 bg-white rounded-xl border border-slate-100 hover:bg-slate-50 transition-colors group">
       {/* 左側: 支出内容、日付、支払い方法 */}
@@ -27,7 +28,7 @@ export function ExpenseItem({ expense, onDeleteExpense }: ExpenseItemProps) {
         </div>
       </div>
 
-      {/* 右側: 金額、カテゴリー、削除ボタン */}
+      {/* 右側: 金額、カテゴリー、操作ボタン(수정/삭제) */}
       <div className="flex items-center gap-3">
         <div className="flex flex-col items-end">
           <span className="font-bold text-rose-500 text-base">
@@ -38,15 +39,28 @@ export function ExpenseItem({ expense, onDeleteExpense }: ExpenseItemProps) {
           </span>
         </div>
 
-        {/* 削除ボタン */}
-        <button
-          type="button"
-          onClick={() => onDeleteExpense(expense.id)}
-          className="text-slate-300 hover:text-rose-500 p-1.5 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer"
-          title="削除"
-        >
-          <Trash2 className="w-4 h-4" />
-        </button>
+        {/* 버튼 영역 (수정 / 삭제) */}
+        <div className="flex items-center gap-1">
+          {/* [수정 버튼] */}
+          <button
+            type="button"
+            onClick={() => onEditExpense(expense)}
+            className="text-slate-300 hover:text-blue-500 p-1.5 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer"
+            title="수정 (編集)"
+          >
+            <Pencil className="w-4 h-4" />
+          </button>
+
+          {/* [삭제 버튼] */}
+          <button
+            type="button"
+            onClick={() => onDeleteExpense(expense.id)}
+            className="text-slate-300 hover:text-rose-500 p-1.5 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer"
+            title="삭제 (削除)"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        </div>
       </div>
     </div>
   );

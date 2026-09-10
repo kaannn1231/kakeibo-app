@@ -2,31 +2,19 @@ import { useEffect, useState } from 'react';
 import { AccountSummary } from './components/AccountSummary';
 import { ExpenseList } from './components/ExpenseList';
 import { ExpenseForm } from './components/ExpenseForm';
+import { EditExpenseModal } from './components/EditExpenseModal';
 import { Calendar } from './components/Calendar';
 import { INITIAL_BUDGET } from './data/mockExpenses';
 import { getDayFromDate } from './utils/date';
-import type { Category } from './constants/categories';
 import type { Expense, NewExpense } from './types/expense';
-
-const API_URL = 'http://localhost:3001/api/expenses';
-
-type ApiExpense = Omit<Expense, 'date' | 'category'> & {
-  date: string;
-  category: string;
-};
-
-function toExpense(expense: ApiExpense): Expense {
-  return {
-    ...expense,
-    date: expense.date.slice(0, 10),
-    category: expense.category as Category,
-  };
-}
+import { expenseApi } from './api/expenses';
 
 function App() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [currentView, setCurrentView] = useState<'list' | 'calendar'>('list');
   const [selectedDay, setSelectedDay] = useState(new Date().getDate());
+  // [수정 기능] 현재 수정 중인 지출 데이터 상태 (null이면 모달 닫힘)
+  const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
 
   const currentYear = 2026;
   const currentMonth = 8;
@@ -34,14 +22,7 @@ function App() {
   useEffect(() => {
     const loadExpenses = async () => {
       try {
-        const response = await fetch(API_URL);
-
-        if (!response.ok) {
-          throw new Error('지출 목록을 불러오지 못했습니다.');
-        }
-
-        const data: ApiExpense[] = await response.json();
-        setExpenses(data.map(toExpense));
+        setExpenses(await expenseApi.list());
       } catch (error) {
         console.error(error);
         alert('서버에서 지출 목록을 불러오지 못했습니다.');
@@ -66,20 +47,7 @@ function App() {
 
   const handleAddExpense = async (newExpenseData: NewExpense) => {
     try {
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newExpenseData),
-      });
-
-      if (!response.ok) {
-        throw new Error('지출을 저장하지 못했습니다.');
-      }
-
-      const savedExpense: ApiExpense = await response.json();
-      const expense = toExpense(savedExpense);
+      const expense = await expenseApi.create(newExpenseData);
 
       setExpenses((currentExpenses) => [expense, ...currentExpenses]);
       setSelectedDay(getDayFromDate(expense.date));
@@ -89,15 +57,24 @@ function App() {
     }
   };
 
+  // [수정 기능] 기존 지출 데이터 수정 처리
+  const handleUpdateExpense = async (idToUpdate: string, updatedData: NewExpense) => {
+    try {
+      const updated = await expenseApi.update(idToUpdate, updatedData);
+
+      setExpenses((currentExpenses) =>
+        currentExpenses.map((item) => (item.id === idToUpdate ? updated : item))
+      );
+    } catch (error) {
+      console.error(error);
+      alert('지출 수정에 실패했습니다.');
+      throw error;
+    }
+  };
+
   const handleDeleteExpense = async (idToDelete: string) => {
     try {
-      const response = await fetch(`${API_URL}/${idToDelete}`, {
-        method: 'DELETE',
-      });
-
-      if (!response.ok) {
-        throw new Error('지출을 삭제하지 못했습니다.');
-      }
+      await expenseApi.remove(idToDelete);
 
       setExpenses((currentExpenses) =>
         currentExpenses.filter((item) => item.id !== idToDelete)
@@ -114,7 +91,7 @@ function App() {
 
   return (
     <div className="min-h-screen bg-slate-100 flex justify-center py-0 sm:py-6">
-      <div className="w-full max-w-md bg-white min-h-screen sm:min-h-[850px] shadow-2xl flex flex-col rounded-none sm:rounded-3xl overflow-hidden">
+      <div className="w-full max-w-md bg-white min-h-screen sm:min-h-[850px] shadow-2xl flex flex-col rounded-none sm:rounded-3xl overflow-hidden relative">
         <AccountSummary
           totalExpense={totalExpense}
           balance={balance}
@@ -127,6 +104,7 @@ function App() {
             <div className="flex-1 overflow-y-auto">
               <ExpenseList
                 expenses={expenses}
+                onEditExpense={(item) => setEditingExpense(item)}
                 onDeleteExpense={handleDeleteExpense}
               />
             </div>
@@ -148,10 +126,20 @@ function App() {
               </div>
               <ExpenseList
                 expenses={selectedExpenses}
+                onEditExpense={(item) => setEditingExpense(item)}
                 onDeleteExpense={handleDeleteExpense}
               />
             </div>
           </div>
+        )}
+
+        {/* [수정 기능 팝업 모달] */}
+        {editingExpense && (
+          <EditExpenseModal
+            expense={editingExpense}
+            onClose={() => setEditingExpense(null)}
+            onSave={handleUpdateExpense}
+          />
         )}
       </div>
     </div>
@@ -159,3 +147,4 @@ function App() {
 }
 
 export default App;
+
