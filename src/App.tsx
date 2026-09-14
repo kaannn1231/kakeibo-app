@@ -13,7 +13,7 @@ function App() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [currentView, setCurrentView] = useState<'list' | 'calendar'>('list');
   const [selectedDay, setSelectedDay] = useState(new Date().getDate());
-  // [수정 기능] 현재 수정 중인 지출 데이터 상태 (null이면 모달 닫힘)
+  // 【修正機能】現在編集中の支出データ（nullの場合はモーダル非表示）
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
 
   const currentYear = 2026;
@@ -25,7 +25,7 @@ function App() {
         setExpenses(await expenseApi.list());
       } catch (error) {
         console.error(error);
-        alert('서버에서 지출 목록을 불러오지 못했습니다.');
+        alert('サーバーから支出一覧を取得できませんでした。');
       }
     };
 
@@ -53,11 +53,11 @@ function App() {
       setSelectedDay(getDayFromDate(expense.date));
     } catch (error) {
       console.error(error);
-      alert('지출 저장에 실패했습니다. 서버가 켜져 있는지 확인해 주세요.');
+      alert('支出の保存に失敗しました。サーバーが起動しているか確認してください。');
     }
   };
 
-  // [수정 기능] 기존 지출 데이터 수정 처리
+  // 【修正機能】既存支出データの更新処理
   const handleUpdateExpense = async (idToUpdate: string, updatedData: NewExpense) => {
     try {
       const updated = await expenseApi.update(idToUpdate, updatedData);
@@ -67,7 +67,7 @@ function App() {
       );
     } catch (error) {
       console.error(error);
-      alert('지출 수정에 실패했습니다.');
+      alert('支出の更新に失敗しました。');
       throw error;
     }
   };
@@ -81,7 +81,7 @@ function App() {
       );
     } catch (error) {
       console.error(error);
-      alert('지출 삭제에 실패했습니다.');
+      alert('支出の削除に失敗しました。');
     }
   };
 
@@ -133,7 +133,7 @@ function App() {
           </div>
         )}
 
-        {/* [수정 기능 팝업 모달] */}
+        {/* 【修正機能】編集モーダル */}
         {editingExpense && (
           <EditExpenseModal
             expense={editingExpense}

@@ -9,13 +9,13 @@ export type ExpenseInput = {
 };
 
 /**
- * [Model - 모델 계층]
- * 데이터베이스(DB)와의 직접적인 상호작용(CRUD)을 전담합니다.
- * 비즈니스 데이터의 구조와 영속성(저장/수정/삭제/조회)을 관리합니다.
+ * [Model - モデル層]
+ * データベース（DB）との直接的なやり取り（CRUD操作）を担当します。
+ * ビジネスデータの構造と永続化（保存・更新・削除・取得）を管理します。
  */
 export const expenseModel = {
   /**
-   * 모든 지출 내역 조회 (날짜 내림차순, 최신 등록순)
+   * すべての支出一覧を取得（日付降順、作成日時降順）
    */
   findAll() {
     return prisma.expense.findMany({
@@ -24,7 +24,7 @@ export const expenseModel = {
   },
 
   /**
-   * 특정 ID의 지출 내역 단건 조회
+   * 特定のIDに対応する支出データを1件取得
    */
   findById(id: string) {
     return prisma.expense.findUnique({
@@ -33,14 +33,14 @@ export const expenseModel = {
   },
 
   /**
-   * 신규 지출 생성
+   * 新規支出データの作成
    */
   create(data: ExpenseInput) {
     return prisma.expense.create({ data });
   },
 
   /**
-   * [수정 기능] 특정 ID의 지출 내역 수정
+   * 【修正機能】特定のIDに対応する支出データの更新
    */
   update(id: string, data: ExpenseInput) {
     return prisma.expense.update({
@@ -50,7 +50,7 @@ export const expenseModel = {
   },
 
   /**
-   * 특정 ID의 지출 삭제
+   * 特定のIDに対応する支出データの削除
    */
   remove(id: string) {
     return prisma.expense.delete({

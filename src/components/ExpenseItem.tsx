@@ -28,7 +28,7 @@ export function ExpenseItem({ expense, onEditExpense, onDeleteExpense }: Expense
         </div>
       </div>
 
-      {/* 右側: 金額、カテゴリー、操作ボタン(수정/삭제) */}
+      {/* 右側: 金額、カテゴリー、操作ボタン（編集・削除） */}
       <div className="flex items-center gap-3">
         <div className="flex flex-col items-end">
           <span className="font-bold text-rose-500 text-base">
@@ -39,24 +39,24 @@ export function ExpenseItem({ expense, onEditExpense, onDeleteExpense }: Expense
           </span>
         </div>
 
-        {/* 버튼 영역 (수정 / 삭제) */}
+        {/* 操作ボタン領域（編集・削除） */}
         <div className="flex items-center gap-1">
-          {/* [수정 버튼] */}
+          {/* 【編集ボタン】 */}
           <button
             type="button"
             onClick={() => onEditExpense(expense)}
             className="text-slate-300 hover:text-blue-500 p-1.5 rounded-lg hover:bg-blue-50 transition-colors cursor-pointer"
-            title="수정 (編集)"
+            title="編集"
           >
             <Pencil className="w-4 h-4" />
           </button>
 
-          {/* [삭제 버튼] */}
+          {/* 【削除ボタン】 */}
           <button
             type="button"
             onClick={() => onDeleteExpense(expense.id)}
             className="text-slate-300 hover:text-rose-500 p-1.5 rounded-lg hover:bg-rose-50 transition-colors cursor-pointer"
-            title="삭제 (削除)"
+            title="削除"
           >
             <Trash2 className="w-4 h-4" />
           </button>

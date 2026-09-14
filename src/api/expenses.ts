@@ -14,22 +14,22 @@ function toExpense(expense: ApiExpense): Expense {
 
 async function request<T>(path = '', options?: RequestInit): Promise<T> {
   const response = await fetch(`${API_URL}${path}`, options);
-  if (!response.ok) throw new Error('지출 요청을 처리하지 못했습니다.');
+  if (!response.ok) throw new Error('支出リクエストの処理に失敗しました。');
   return response.status === 204 ? undefined as T : response.json() as Promise<T>;
 }
 
 export const expenseApi = {
-  // [조회 용도] 전체 지출 목록 조회
+  // 【取得用途】支出一覧の取得
   async list() {
     return (await request<ApiExpense[]>('/list')).map(toExpense);
   },
 
-  // [조회 용도] 특정 지출 상세 단건 조회
+  // 【取得用途】特定の支出詳細（1件）の取得
   async getById(id: string) {
     return toExpense(await request<ApiExpense>(`/detail/${id}`));
   },
 
-  // [등록 용도] 신규 지출 추가 (POST)
+  // 【登録用途】新規支出の追加 (POST)
   async create(expense: NewExpense) {
     return toExpense(await request<ApiExpense>('/create', {
       method: 'POST',
@@ -38,7 +38,7 @@ export const expenseApi = {
     }));
   },
 
-  // [수정 용도] 기존 지출 수정 (PUT)
+  // 【修正用途】既存支出の更新 (PUT)
   async update(id: string, expense: NewExpense) {
     return toExpense(await request<ApiExpense>(`/update/${id}`, {
       method: 'PUT',
@@ -47,7 +47,7 @@ export const expenseApi = {
     }));
   },
 
-  // [삭제 용도] 지출 삭제 (DELETE)
+  // 【削除用途】支出の削除 (DELETE)
   remove(id: string) {
     return request<void>(`/delete/${id}`, { method: 'DELETE' });
   },

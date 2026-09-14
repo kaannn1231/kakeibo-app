@@ -6,14 +6,14 @@ import { healthRouter } from './routes/healthRoutes.js';
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// 미들웨어 설정 (모든 요청에서 공통 적용)
-app.use(cors()); // 다른 도메인(Vite 개발서버 등)에서의 API 요청 허용
-app.use(express.json()); // JSON 형식의 Request Body 파싱
+// ミドルウェア設定（全リクエスト共通）
+app.use(cors()); // 異なるドメイン（Vite開発サーバー等）からのAPIリクエストを許可
+app.use(express.json()); // JSON形式のリクエストボディをパース
 
-// [API 용도별 분리 - 라우터 등록]
-// 1. 서버 상태 점검용 API: /api/health
+// 【APIを用途毎に分ける - ルーター登録】
+// 1. サーバー稼働状態確認用API: /api/health
 app.use('/api/health', healthRouter);
-// 2. 가계부 지출 관리 API: /api/expenses
+// 2. 家計簿支出管理API: /api/expenses
 app.use('/api/expenses', expenseRouter);
 
 app.listen(PORT, () => {

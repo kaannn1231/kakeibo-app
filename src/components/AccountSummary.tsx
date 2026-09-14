@@ -21,17 +21,17 @@ export function AccountSummary({
 
   return (
     <div className="bg-[#2554eb] text-white px-5 pt-8 pb-8">
-      {/* 1. ナビゲーションバー (가운데 정렬) */}
+      {/* 1. ナビゲーションバー（中央配置） */}
       <div className="flex items-center justify-between">
-        {/* 왼쪽: 오른쪽 버튼과 똑같은 크기의 투명 빈 상자 (균형 맞추기용) */}
+        {/* 左側: 右側ボタンと均等を保つためのスペーサー */}
         <div className="w-9"></div>
 
-        {/* ⭐ 가운데: 제목이 남은 공간을 다 먹고 정중앙 정렬! ⭐ */}
+        {/* 中央: タイトル表示 */}
         <h1 className="text-xl font-bold text-center flex-1">
           {currentView === 'list' ? '取引一覧' : 'カレンダー'}
         </h1>
 
-        {/* 오른쪽: 화면 전환 버튼 */}
+        {/* 右側: 画面切り替えボタン */}
         <button
           type="button"
           onClick={onToggleView}

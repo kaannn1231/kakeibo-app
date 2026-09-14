@@ -11,7 +11,7 @@ type EditExpenseModalProps = {
 };
 
 /**
- * [수정 기능] 선택된 지출 항목을 수정하기 위한 모달 팝업 컴포넌트
+ * 【修正機能】選択された支出データを編集するためのモーダルコンポーネント
  */
 export function EditExpenseModal({ expense, onClose, onSave }: EditExpenseModalProps) {
   const [date, setDate] = useState(expense.date);
@@ -26,7 +26,7 @@ export function EditExpenseModal({ expense, onClose, onSave }: EditExpenseModalP
 
     const numericAmount = Number(amount);
     if (!description.trim() || numericAmount <= 0) {
-      alert('내용과 금액(1원 이상)을 올바르게 입력해 주세요.');
+      alert('内容と金額（1円以上）を正しく入力してください。');
       return;
     }
 
@@ -42,7 +42,7 @@ export function EditExpenseModal({ expense, onClose, onSave }: EditExpenseModalP
       onClose();
     } catch (error) {
       console.error(error);
-      alert('지출 수정에 실패했습니다.');
+      alert('支出の更新に失敗しました。');
     } finally {
       setIsSubmitting(false);
     }
@@ -51,10 +51,10 @@ export function EditExpenseModal({ expense, onClose, onSave }: EditExpenseModalP
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
       <div className="bg-white w-full max-w-sm rounded-2xl shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-        {/* 모달 헤더 */}
+        {/* モーダルヘッダー */}
         <div className="flex items-center justify-between px-4 py-3 border-b border-slate-100 bg-slate-50">
           <h3 className="text-sm font-bold text-slate-800 flex items-center gap-1.5">
-            ✏️ 支出の修正 (지출 수정)
+            ✏️ 支出の修正
           </h3>
           <button
             type="button"
@@ -65,12 +65,12 @@ export function EditExpenseModal({ expense, onClose, onSave }: EditExpenseModalP
           </button>
         </div>
 
-        {/* 모달 본문 폼 */}
+        {/* モーダルフォーム本体 */}
         <form onSubmit={handleSubmit} className="p-4 flex flex-col gap-3">
-          {/* 1행: 날짜 & 카테고리 */}
+          {/* 1行目: 日付 & カテゴリー */}
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="text-[11px] font-semibold text-slate-500 block mb-1">날짜</label>
+              <label className="text-[11px] font-semibold text-slate-500 block mb-1">日付</label>
               <input
                 type="date"
                 value={date}
@@ -81,7 +81,7 @@ export function EditExpenseModal({ expense, onClose, onSave }: EditExpenseModalP
             </div>
 
             <div>
-              <label className="text-[11px] font-semibold text-slate-500 block mb-1">카테고리</label>
+              <label className="text-[11px] font-semibold text-slate-500 block mb-1">カテゴリー</label>
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value as Category)}
@@ -96,10 +96,10 @@ export function EditExpenseModal({ expense, onClose, onSave }: EditExpenseModalP
             </div>
           </div>
 
-          {/* 2행: 내용 & 금액 */}
+          {/* 2行目: 内容 & 金額 */}
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="text-[11px] font-semibold text-slate-500 block mb-1">내용・가게명</label>
+              <label className="text-[11px] font-semibold text-slate-500 block mb-1">内容・店名</label>
               <input
                 type="text"
                 value={description}
@@ -110,7 +110,7 @@ export function EditExpenseModal({ expense, onClose, onSave }: EditExpenseModalP
             </div>
 
             <div>
-              <label className="text-[11px] font-semibold text-slate-500 block mb-1">금액 (円)</label>
+              <label className="text-[11px] font-semibold text-slate-500 block mb-1">金額 (円)</label>
               <input
                 type="number"
                 min="1"
@@ -122,9 +122,9 @@ export function EditExpenseModal({ expense, onClose, onSave }: EditExpenseModalP
             </div>
           </div>
 
-          {/* 3행: 결제 수단 */}
+          {/* 3行目: 支払い方法 */}
           <div>
-            <label className="text-[11px] font-semibold text-slate-500 block mb-1">결제 방법</label>
+            <label className="text-[11px] font-semibold text-slate-500 block mb-1">支払い方法</label>
             <div className="flex gap-1.5">
               {['現金', 'カード', '電子マネー'].map((method) => (
                 <button
@@ -143,7 +143,7 @@ export function EditExpenseModal({ expense, onClose, onSave }: EditExpenseModalP
             </div>
           </div>
 
-          {/* 모달 하단 버튼 */}
+          {/* モーダル下部ボタン */}
           <div className="flex gap-2 mt-2 pt-2 border-t border-slate-100">
             <button
               type="button"
@@ -151,14 +151,14 @@ export function EditExpenseModal({ expense, onClose, onSave }: EditExpenseModalP
               disabled={isSubmitting}
               className="flex-1 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-lg font-bold text-xs transition-colors cursor-pointer"
             >
-              취소
+              キャンセル
             </button>
             <button
               type="submit"
               disabled={isSubmitting}
               className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-bold text-xs shadow transition-colors cursor-pointer disabled:opacity-50"
             >
-              {isSubmitting ? '저장 중...' : '수정 완료'}
+              {isSubmitting ? '保存中...' : '保存する'}
             </button>
           </div>
         </form>
