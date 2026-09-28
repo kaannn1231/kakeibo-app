@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { AccountSummary } from './components/AccountSummary';
 import { ExpenseList } from './components/ExpenseList';
 import { ExpenseForm } from './components/ExpenseForm';
+import { ExpenseChart } from './components/ExpenseChart';
 import { EditExpenseModal } from './components/EditExpenseModal';
 import { Calendar } from './components/Calendar';
 import { INITIAL_BUDGET } from './data/mockExpenses';
@@ -11,7 +12,7 @@ import { expenseApi } from './api/expenses';
 
 function App() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
-  const [currentView, setCurrentView] = useState<'list' | 'calendar'>('list');
+  const [currentView, setCurrentView] = useState<'list' | 'calendar' | 'chart'>('list');
   const [selectedDay, setSelectedDay] = useState(new Date().getDate());
   // 【修正機能】現在編集中の支出データ（nullの場合はモーダル非表示）
   const [editingExpense, setEditingExpense] = useState<Expense | null>(null);
@@ -85,10 +86,6 @@ function App() {
     }
   };
 
-  const handleToggleView = () => {
-    setCurrentView(currentView === 'list' ? 'calendar' : 'list');
-  };
-
   return (
     <div className="min-h-screen bg-slate-100 flex justify-center py-0 sm:py-6">
       <div className="w-full max-w-md bg-white min-h-screen sm:min-h-[850px] shadow-2xl flex flex-col rounded-none sm:rounded-3xl overflow-hidden relative">
@@ -96,7 +93,7 @@ function App() {
           totalExpense={totalExpense}
           balance={balance}
           currentView={currentView}
-          onToggleView={handleToggleView}
+          onSelectView={setCurrentView}
         />
 
         {currentView === 'list' ? (
@@ -110,7 +107,7 @@ function App() {
             </div>
             <ExpenseForm onAddExpense={handleAddExpense} />
           </>
-        ) : (
+        ) : currentView === 'calendar' ? (
           <div className="flex-1 overflow-y-auto bg-slate-50 flex flex-col">
             <Calendar
               year={currentYear}
@@ -131,6 +128,8 @@ function App() {
               />
             </div>
           </div>
+        ) : (
+          <ExpenseChart expenses={expenses} />
         )}
 
         {/* 【修正機能】編集モーダル */}
